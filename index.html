@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="robots" content="noindex">
-<title>Bi kupili?</title>
+<title>Kateri je zmagovalec?</title>
 <style>
 @font-face{font-family:"Bricolage";src:url(fonti/bricolage-lat.woff2) format("woff2");font-weight:200 400;unicode-range:U+0000-00FF,U+2000-206F,U+20AC}
 @font-face{font-family:"Bricolage";src:url(fonti/bricolage-ext.woff2) format("woff2");font-weight:200 400;unicode-range:U+0100-02BA,U+02BD-02FF,U+1E00-1EFF}
@@ -15,7 +15,7 @@ html,body{height:100%;background:#000;color:#f4f4f2;overflow:hidden;overscroll-b
 body{font-family:"Bricolage",sans-serif;font-weight:200;display:flex;flex-direction:column;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));user-select:none;-webkit-user-select:none}
 .mono{font-family:"Fragment",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a86}
 header{display:flex;justify-content:space-between;align-items:baseline;padding:4px 2px 14px}
-h1{font-weight:200;font-size:34px;letter-spacing:-.02em;line-height:1}
+h1{font-weight:200;font-size:30px;letter-spacing:-.02em;line-height:1}
 .deck{position:relative;flex:1;min-height:0}
 .card{position:absolute;inset:0;border-radius:14px;overflow:hidden;background:#111;touch-action:none;transition:transform .35s cubic-bezier(.2,.7,0,1),opacity .35s;will-change:transform}
 .card video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -23,22 +23,27 @@ h1{font-weight:200;font-size:34px;letter-spacing:-.02em;line-height:1}
 .card .name{font-size:30px;letter-spacing:-.01em;font-weight:300}
 .card .price{margin-top:6px}
 .stamp{position:absolute;top:22px;padding:6px 12px;border:2px solid;border-radius:8px;font-family:"Fragment",monospace;font-size:18px;letter-spacing:.12em;opacity:0}
-.stamp.da{left:18px;color:#fff;border-color:#fff;transform:rotate(-12deg)}
-.stamp.ne{right:18px;color:#fff;border-color:#fff;transform:rotate(12deg)}
-.btns{display:flex;gap:14px;padding-top:16px}
-.btns button{flex:1;height:64px;border-radius:999px;border:1px solid #3a3a37;background:#0c0c0c;color:#f4f4f2;font-family:"Fragment",monospace;font-size:14px;letter-spacing:.14em;text-transform:uppercase}
-.btns button:active{background:#f4f4f2;color:#000}
+.stamp.da{left:18px;color:#22d47a;border-color:#22d47a;transform:rotate(-12deg);font-size:30px;padding:2px 14px}
+.stamp.ne{right:18px;color:#ff3b4e;border-color:#ff3b4e;transform:rotate(12deg);font-size:30px;padding:2px 14px}
+.btns{display:flex;justify-content:center;gap:42px;padding-top:18px}
+.btns button{width:76px;height:76px;border-radius:50%;background:#0c0c0c;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.btns button:active{transform:scale(.9)}
+.btns svg{width:34px;height:34px;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#bne{border:2px solid #ff3b4e}#bne svg{stroke:#ff3b4e}
+#bda{border:2px solid #22d47a}#bda svg{stroke:#22d47a}
+@keyframes nudge{0%,100%{transform:none}25%{transform:translateX(-46px) rotate(-6deg)}60%{transform:translateX(46px) rotate(6deg)}}
+.card.nudge{animation:nudge 1.3s cubic-bezier(.4,0,.2,1) .6s 1}
 .done{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;gap:14px;padding:0 6px}
 .done.on{display:flex}
 .done .big{font-size:56px;line-height:.95;letter-spacing:-.03em}
 </style>
 </head>
 <body>
-<header><h1>Bi kupili?</h1><span class="mono" id="st">1 / 2</span></header>
+<header><h1>Kateri je zmagovalec?</h1><span class="mono" id="st">1 / 2</span></header>
 <div class="deck" id="deck">
   <div class="done" id="done"><div class="big">Hvala.</div><div class="mono">Poglejte na platno.</div></div>
 </div>
-<div class="btns" id="btns"><button id="bne">✕ &nbsp;Ne</button><button id="bda">Ja &nbsp;♥</button></div>
+<div class="btns" id="btns"><button id="bne" aria-label="Ne"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><button id="bda" aria-label="Ja"><svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></svg></button></div>
 <script>
 const TOPIC='hsplus-itdepends-v7q2k9x4';
 const items=[
@@ -50,26 +55,27 @@ const deck=document.getElementById('deck'),done=document.getElementById('done'),
 let idx=0,cards=[];
 items.slice().reverse().forEach(it=>{
   const c=document.createElement('div');c.className='card';c.dataset.id=it.id;
-  c.innerHTML=`<video src="${it.src}" poster="${it.poster}" muted loop playsinline autoplay preload="auto"></video><div class="stamp da">JA</div><div class="stamp ne">NE</div><div class="info"><div class="name">${it.name}</div><div class="mono price">${it.price}</div></div>`;
+  c.innerHTML=`<video src="${it.src}" poster="${it.poster}" muted loop playsinline autoplay preload="auto"></video><div class="stamp da">✓</div><div class="stamp ne">✕</div><div class="info"><div class="name">${it.name}</div><div class="mono price">${it.price}</div></div>`;
   deck.appendChild(c);
 });
 cards=items.map(it=>deck.querySelector(`.card[data-id="${it.id}"]`));
+cards[0].classList.add('nudge');
 function send(id,v){
   fetch('https://ntfy.sh/'+TOPIC,{method:'POST',body:JSON.stringify({id,v,dev,t:Date.now()})}).catch(()=>{});
 }
 function vote(v){
   const c=cards[idx];if(!c)return;
   send(items[idx].id,v);
-  c.style.transform=`translateX(${v?140:-140}%) rotate(${v?18:-18}deg)`;c.style.opacity=0;
+  c.classList.remove('nudge');c.querySelector(v?'.da':'.ne').style.opacity=1;c.style.transition='transform .45s cubic-bezier(.3,.6,.2,1),opacity .45s';c.style.transform=`translateX(${v?150:-150}%) rotate(${v?24:-24}deg)`;c.style.opacity=0;
   idx++;
   if(idx>=items.length){document.getElementById('btns').style.visibility='hidden';st.textContent='';setTimeout(()=>done.classList.add('on'),250)}
-  else{st.textContent=(idx+1)+' / '+items.length;cards[idx].querySelector('video').play().catch(()=>{})}
+  else{st.textContent=(idx+1)+' / '+items.length;cards[idx].querySelector('video').play().catch(()=>{});cards[idx].classList.add('nudge')}
 }
 document.getElementById('bda').onclick=()=>vote(1);
 document.getElementById('bne').onclick=()=>vote(0);
 // swipe
 let x0=null,dx=0;
-deck.addEventListener('pointerdown',e=>{const c=cards[idx];if(!c)return;x0=e.clientX;dx=0;c.style.transition='none';c.setPointerCapture?.(e.pointerId)});
+deck.addEventListener('pointerdown',e=>{const c=cards[idx];if(!c)return;c.classList.remove('nudge');x0=e.clientX;dx=0;c.style.transition='none';c.setPointerCapture?.(e.pointerId)});
 deck.addEventListener('pointermove',e=>{const c=cards[idx];if(x0===null||!c)return;dx=e.clientX-x0;c.style.transform=`translateX(${dx}px) rotate(${dx/20}deg)`;c.querySelector('.da').style.opacity=Math.max(0,dx/120);c.querySelector('.ne').style.opacity=Math.max(0,-dx/120)});
 const end=()=>{const c=cards[idx];if(x0===null||!c)return;c.style.transition='';x0=null;if(Math.abs(dx)>90)vote(dx>0?1:0);else{c.style.transform='';c.querySelectorAll('.stamp').forEach(s=>s.style.opacity=0)}};
 deck.addEventListener('pointerup',end);deck.addEventListener('pointercancel',end);
